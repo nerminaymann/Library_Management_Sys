@@ -3,8 +3,10 @@ import datetime
 from django.db import models
 
 from Library_Management_Sys import settings
-# from django.contrib.auth.models import User
 from library.models import Library
+
+
+# from django.contrib.auth.models import User
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
@@ -21,9 +23,8 @@ class Book(models.Model):
         title = models.CharField(max_length=200)
         author = models.ForeignKey(Author, on_delete=models.CASCADE)
         category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-        library = models.ForeignKey(Library, on_delete=models.CASCADE)
+        library = models.ForeignKey(Library,related_name='books', on_delete=models.CASCADE)
         is_available = models.BooleanField(default=True)
-        # isbn = models.CharField(max_length=13, unique=True)
         copies = models.IntegerField(default=1)
         def __str__(self):
             return self.title
@@ -48,4 +49,4 @@ class ReturnTransaction(models.Model):
     return_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.borrow_transaction.borrower.name} - {self.return_date}"
+        return f"{self.borrow_transaction.borrower} - {self.return_date}"

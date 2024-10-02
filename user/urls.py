@@ -1,13 +1,13 @@
 from django.urls import path
 from django.contrib.auth import get_user_model
-from .views import CreateUserView, CreateAuthTokenView, UpdateUserView
+from .views import RegisterView, LoginView, UpdateUserView
 
 User = get_user_model()
 app_name = 'user'
 
 urlpatterns = [
-    path('signup/',CreateUserView.as_view(),name='create'),
-    path('token/',CreateAuthTokenView.as_view(),name='token'),
+    path('signup/',RegisterView.as_view(),name='signup'),
+    path('login/',LoginView.as_view(),name='login'),
     path('me/', UpdateUserView.as_view(), name='me'),
 
 ]
