@@ -41,8 +41,9 @@ INSTALLED_APPS = [
     # "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "library",
+    "author",
     "book",
-    "user"
+    "user",
 ]
 
 MIDDLEWARE = [

@@ -1,19 +1,23 @@
 from django.db.models import Count, Q
 from rest_framework import generics
-from .models import Author, Book
+from .models import Author
+from book.models import Book
 from .serializers import AuthorWithBookCountSerializer,AuthorSerializer
 
 class AuthorListView(generics.ListAPIView):
     serializer_class = AuthorWithBookCountSerializer
 
     def get_queryset(self):
-        library_id = self.request.query_params.get('library', None)
+        library_name = self.request.query_params.get('library', None)
         category_name = self.request.query_params.get('category', None)
+        author_name = self.request.query_params.get('author_name', None)
         books = Book.objects.all()
 
+        if author_name:
+            books = books.filter(name__icontains=author_name)
         # Apply filtering by library, if provided
-        if library_id:
-            books = books.filter(library_id=library_id)
+        if library_name:
+            books = books.filter(library__name__icontains=library_name)
 
         # Apply filtering by category, if provided
         if category_name:
@@ -25,4 +29,5 @@ class AuthorListView(generics.ListAPIView):
         ).filter(book_count__gt=0)  # Only include authors with at least one book matching the filters
 
         return queryset
+
 

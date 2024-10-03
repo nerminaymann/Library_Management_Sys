@@ -1,18 +1,9 @@
 from django.utils import timezone
-import datetime
 from django.db import models
-
 from Library_Management_Sys import settings
 from library.models import Library
-
-
+from author.models import Author
 # from django.contrib.auth.models import User
-
-class Author(models.Model):
-    name = models.CharField(max_length=100)
-    bio = models.TextField(null=True, blank=True)
-    def __str__(self):
-        return self.name
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -21,13 +12,18 @@ class Category(models.Model):
 
 class Book(models.Model):
         title = models.CharField(max_length=200)
-        author = models.ForeignKey(Author, on_delete=models.CASCADE)
+        author = models.ForeignKey(Author,related_name='books', on_delete=models.CASCADE)
         category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-        library = models.ForeignKey(Library,related_name='books', on_delete=models.CASCADE)
+        library = models.ForeignKey(Library, on_delete=models.CASCADE)
         is_available = models.BooleanField(default=True)
         copies = models.IntegerField(default=1)
+
         def __str__(self):
             return self.title
+
+        # def BookCounts(self):
+        #     num = Book.objects.filter(author = self.author).count()
+
 
 class BorrowTransaction(models.Model):
             book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -35,6 +31,7 @@ class BorrowTransaction(models.Model):
             borrowed_at = models.DateTimeField(auto_now_add=True)
             due_date = models.DateField()
             returned_at = models.DateTimeField(null=True, blank=True)
+
             def is_overdue(self):
                 if self.returned_at is None and self.due_date < timezone.now().date():
                     return True
