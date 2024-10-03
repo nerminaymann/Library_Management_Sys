@@ -12,8 +12,7 @@ class BooksDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     class Meta:
         model = Book
-        fields = [ 'title', 'author', 'category']
-
+        fields = ['id', 'title', 'author', 'category']
 
 class BorrowTransactionSerializer(serializers.ModelSerializer):
     books = BooksDetailSerializer(many=True)
@@ -23,7 +22,6 @@ class BorrowTransactionSerializer(serializers.ModelSerializer):
 
 class ReturnTransactionSerializer(serializers.ModelSerializer):
     borrow_transaction = BorrowTransactionSerializer()
-
     class Meta:
         model = ReturnTransaction
         fields = '__all__'

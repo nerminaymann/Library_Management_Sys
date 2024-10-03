@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     # "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    "django_filters",
     "library",
     "author",
     "book",
@@ -55,6 +56,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+}
 
 ROOT_URLCONF = 'Library_Management_Sys.urls'
 

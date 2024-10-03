@@ -13,17 +13,13 @@ class Category(models.Model):
 class Book(models.Model):
         title = models.CharField(max_length=200)
         author = models.ForeignKey(Author,related_name='books', on_delete=models.CASCADE)
-        category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-        library = models.ForeignKey(Library, on_delete=models.CASCADE)
+        category = models.ForeignKey(Category, related_name='books',on_delete=models.SET_NULL, null=True)
+        library = models.ForeignKey(Library,related_name='books', on_delete=models.CASCADE)
         is_available = models.BooleanField(default=True)
         copies = models.IntegerField(default=1)
 
         def __str__(self):
             return self.title
-
-        # def BookCounts(self):
-        #     num = Book.objects.filter(author = self.author).count()
-
 
 class BorrowTransaction(models.Model):
             book = models.ForeignKey(Book, on_delete=models.CASCADE)

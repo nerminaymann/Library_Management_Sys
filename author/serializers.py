@@ -13,14 +13,19 @@ class BooksOfAuthorSerializer(serializers.ModelSerializer):
         model = Book
         fields = ['id','title','category']
 
-class AuthorSerializer(serializers.ModelSerializer):
+class AuthorWithBooksSerializer(serializers.ModelSerializer):
     books = BooksOfAuthorSerializer(many=True, read_only=True)
     class Meta:
         model = Author
         fields = ['id', 'name', 'books']
 
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ['id', 'name']
+
 class AuthorWithBookCountSerializer(serializers.ModelSerializer):
-    book_count = serializers.IntegerField()
+    book_count = serializers.IntegerField(read_only=True)
     class Meta:
         model = Author
         fields = ['id', 'name', 'book_count']
