@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from book.serializers import CategorySerializer, AuthorSerializer, BookSerializer
+from book.serializers import CategorySerializer, BooksDetailSerializer
 from .models import Library
 
 
+
 class LibrarySerializer(serializers.ModelSerializer):
-    books = BookSerializer(many=True)
+    books = BooksDetailSerializer(many=True)
     categories = serializers.SerializerMethodField()
 
     class Meta:
