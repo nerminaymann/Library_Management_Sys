@@ -1,4 +1,6 @@
+
 from django.db import models
+from user.models import User
 
 
 class Library(models.Model):
@@ -9,4 +11,5 @@ class Library(models.Model):
     # longitude = models.FloatField()
 
     def __str__(self):
-        return self.name    
+        return self.name
+
