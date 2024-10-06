@@ -30,6 +30,7 @@ class BookAvailabilityConsumer(AsyncWebsocketConsumer):
             }
         )
 
+    # will be used to send notifications to all connected clients when a book is returned.
     async def book_availability_update(self, event):
         message = event['message']
 

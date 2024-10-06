@@ -16,8 +16,8 @@ class BooksDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'author', 'category']
 
 class BorrowTransactionSerializer(serializers.ModelSerializer):
-    books = BooksDetailSerializer(many=True)
     class Meta:
         model = BorrowTransaction
-        fields = '__all__'
+        fields = ['id', 'user', 'book', 'library', 'borrow_date', 'return_date', 'returned']
+        read_only_fields = ['user', 'borrow_date', 'returned']
 
