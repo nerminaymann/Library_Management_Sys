@@ -6,11 +6,13 @@ from rest_framework.response import Response
 from .filters import AuthorFilter
 from .models import Author
 from .serializers import AuthorWithBookCountSerializer,AuthorWithBooksSerializer
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 
 class AuthorListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = AuthorFilter
     serializer_class = AuthorWithBookCountSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Author.objects.all()
@@ -31,6 +33,7 @@ class AuthorListView(generics.ListAPIView):
 class AuthorDetailView(generics.RetrieveAPIView):
     serializer_class = AuthorWithBooksSerializer
     queryset = Author.objects.all()
+    permission_classes = [IsAuthenticated]
     def get_author(self,request,pk):
         author = get_object_or_404(Author, id=pk)
         serializer = AuthorWithBooksSerializer(author)

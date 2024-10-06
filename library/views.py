@@ -18,6 +18,7 @@ class LibraryListView(generics.ListAPIView):
     serializer_class = LibrarySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = LibraryFilter
+    permission_classes = [IsAuthenticated]
 
 
 

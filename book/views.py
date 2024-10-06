@@ -7,6 +7,7 @@ from .models import Book,BorrowTransaction
 from .serializers import BooksDetailSerializer, BorrowTransactionSerializer
 from .filters import BookFilter
 from library.tasks import send_borrow_confirmation_email
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 
 
 class BookListView(generics.ListAPIView):
@@ -14,11 +15,13 @@ class BookListView(generics.ListAPIView):
     serializer_class = BooksDetailSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = BookFilter
+    permission_classes = [IsAuthenticated]
 
 
 class BorrowBookView(generics.ListCreateAPIView):
     queryset = BorrowTransaction.objects.all()
     serializer_class = BorrowTransactionSerializer
+    permission_classes = [IsAdminUser]
     def perform_create(self, serializer):
 
         book = serializer.validated_data['book']
