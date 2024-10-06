@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -75,6 +76,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Library_Management_Sys.wsgi.application'
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+
+CELERY_BEAT_SCHEDULE = {
+    'send-borrow-reminders-every-day': {
+        'task': 'library.tasks.send_borrow_reminder_email',
+        'schedule': crontab(hour=8, minute=0),  # Sends reminder every day at 8 AM
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
