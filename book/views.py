@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -66,9 +68,21 @@ class ReturnBookView(generics.UpdateAPIView):
         transaction = self.get_object()
         if transaction.returned:
             raise serializers.ValidationError("This book has already been returned")
+        transaction.returned = True
+        transaction.save()
 
         # Call the return_book logic to mark the transaction as returned
         transaction.return_book()
+
+        # Trigger WebSocket notification
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'book_availability',
+            {
+                'type': 'book_availability_update',
+                'message': f'The book "{transaction.book.title}" is now available!'
+            }
+        )
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
