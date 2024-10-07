@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "rest_framework",
+    "drf_spectacular",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "djoser",
@@ -60,6 +61,21 @@ REST_FRAMEWORK = {
         # 'rest_authtoken.auth.AuthTokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE':'Library Management Backend System DRF',
+    'DESCRIPTION':'A REST API for Library Management System to allow users borrow & return books easily',
+    'SECURITY_DEFINITIONS':{
+        'Bearer':{
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+    'DEFAULT_VERSION': '1.0.0',
+    'CONTACT_EMAIL': 'nerminayman1452@gmail.com',
 }
 
 SIMPLE_JWT = {
