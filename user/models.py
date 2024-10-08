@@ -3,8 +3,6 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.translation import gettext_lazy as _
-
-
 from user.managers import CustomUserManager
 
 class User(AbstractBaseUser,PermissionsMixin):
@@ -16,7 +14,6 @@ class User(AbstractBaseUser,PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username','phone_number']
     objects = CustomUserManager()
-
 
     def __str__(self):
         return self.email

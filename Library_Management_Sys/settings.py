@@ -94,15 +94,19 @@ SIMPLE_JWT = {
 }
 
 DJOSER = {
+    # 'PASSWORD_RESET_URL': 'auth/users/reset_password/{email}',
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    # 'EMAIL_RESET_CONFIRM_URL': 'auth/users/reset_email_confirm/{uid}/{token}',
+    # 'ACTIVATION_URL': 'auth/users/activation/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
-    # 'SERIALIZERS': {},
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SERIALIZERS': {
+        'user': 'user.serializers.UserSerializer',
+        'user_update': 'user.serializers.OtherUsersSerializer',
+    },
 }
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
-
 
 ROOT_URLCONF = 'Library_Management_Sys.urls'
 
@@ -146,7 +150,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -180,7 +183,9 @@ USE_TZ = True
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'static')]
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 AUTH_USER_MODEL = 'user.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -188,5 +193,6 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'nerminayman1452@gmail.com'
-EMAIL_HOST_PASSWORD = 'dwxt peyt ljmu yxpj'
+EMAIL_HOST_PASSWORD = 'rvgk alsx dkwh oqna'
+# DEFAULT_FROM_EMAIL = 'Library <noreply@library.com>'
 

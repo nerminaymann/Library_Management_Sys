@@ -34,6 +34,7 @@ Additionally, the system allows filtering libraries, books and authors based on 
 
 #### Library
 * GET /api/library/libraries/: get all libraries brnaches.
+* GET /api/library/libraries/{id}/: get a specific library.
 * GET /api/library/libraries/?category=<category_name>: get filtering libraries which include specific category.
 * GET /api/library/libraries/?author=<author_name>: get filtering libraries which include specific author.
 * GET /api/library/libraries/?category=<category_name>&author=<author_name>: get filtering libraries which include specific category and author.

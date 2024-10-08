@@ -6,8 +6,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status, serializers
 from rest_framework.response import Response
 from django.utils import timezone
-from .models import Book,BorrowTransaction
-from .serializers import BooksDetailSerializer, BorrowTransactionSerializer
+
+from library.models import Library
+from .models import Book,Transaction
+from .serializers import BooksDetailSerializer, TransactionSerializer
 from .filters import BookFilter
 from library.tasks import send_borrow_confirmation_email
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
@@ -21,14 +23,45 @@ class BookListView(generics.ListAPIView):
     filterset_class = BookFilter
     permission_classes = [IsAuthenticated]
 
+class BookDetailView(generics.RetrieveAPIView):
+    serializer_class = BooksDetailSerializer
+    queryset = Book.objects.all()
+    permission_classes = [IsAuthenticated]
+    def get_book(self,request,pk):
+        book = get_object_or_404(Book, id=pk)
+        serializer = BooksDetailSerializer(book)
+        return Response(data = serializer.data,status=status.HTTP_200_OK)
+
+
 class BorrowBookView(generics.ListCreateAPIView):
-    queryset = BorrowTransaction.objects.all()
-    serializer_class = BorrowTransactionSerializer
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
     permission_classes = [IsAdminUser]
 
     def perform_create(self, serializer):
         book_id = self.kwargs['book_id']
         book = get_object_or_404(Book, id=book_id)
+        # library = Library.objects.get(id=book.library_id)
+        # library =
+        user = self.request.user
+
+        # Check if the user already has an active transaction for this book
+        if Transaction.objects.filter(user=user, book=book, returned=False).exists():
+            return Response({
+                "error": "You already have this book borrowed and haven't returned it yet."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the user has borrowed the same book from another library
+        # if Transaction.objects.filter(user=user, book=book).exclude(library=book.library).exists():
+        if Transaction.objects.filter(user=user, book=book).exists():
+            return Response({
+                "error": "You cannot borrow the same book."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # if Transaction.objects.filter(user=user, book=book).exclude(library=book.library).exists():
+        #     return Response({
+        #         "error": "You cannot borrow the same book from another library."
+        #     }, status=status.HTTP_400_BAD_REQUEST)
 
         if not book.is_available:
             return Response({"error": "This book is not available"}, status=status.HTTP_400_BAD_REQUEST)
@@ -36,7 +69,7 @@ class BorrowBookView(generics.ListCreateAPIView):
         borrow_period = timezone.now() + timezone.timedelta(days=30)
         user = self.request.user
 
-        serializer.save(
+        transaction = serializer.save(
             user=user,
             book=book,
             library=book.library,
@@ -47,6 +80,8 @@ class BorrowBookView(generics.ListCreateAPIView):
 
         # Trigger the Celery task to send a confirmation email
         send_borrow_confirmation_email.delay(user.email, book.title)
+        return transaction
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -56,21 +91,18 @@ class BorrowBookView(generics.ListCreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response({
             'message': 'Book borrowed successfully!',
-            'transaction': BorrowTransactionSerializer(transaction).data
+            'transaction': TransactionSerializer(transaction).data
         }, status=status.HTTP_201_CREATED, headers=headers)
 
 class ReturnBookView(generics.UpdateAPIView):
-    queryset = BorrowTransaction.objects.all()
-    serializer_class = BorrowTransactionSerializer
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
     lookup_url_kwarg = 'transaction_id'
 
     def perform_update(self, serializer):
         transaction = self.get_object()
         if transaction.returned:
             raise serializers.ValidationError("This book has already been returned")
-        transaction.returned = True
-        transaction.save()
-
         # Call the return_book logic to mark the transaction as returned
         transaction.return_book()
 

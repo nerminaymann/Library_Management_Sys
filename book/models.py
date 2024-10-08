@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.utils import timezone
@@ -23,32 +25,39 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-class BorrowTransaction(models.Model):
+class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     library = models.ForeignKey(Library, on_delete=models.CASCADE)
     borrow_date = models.DateTimeField(default=timezone.now)
-    return_date = models.DateTimeField()  # the expected return date
+    return_date = models.DateTimeField(null=True, blank=True)  # the expected maximum return date
     actual_return_date = models.DateTimeField(null=True, blank=True)  # filled when the book is returned
     returned = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
+        if self.borrow_date and not self.return_date:
+            self.return_date = self.borrow_date + timedelta(days=30)
+
         # When a transaction is created (borrowing), mark the book as unavailable
         if not self.returned:
-            self.book.available = False
-            self.book.save()
+            self.book.is_available = False
+        else:
+            self.actual_return_date = timezone.now()
+            self.book.is_available = True
+        self.book.save()
         super().save(*args, **kwargs)
 
     def return_book(self):
         # When a book is returned
-        self.returned = True
+        #if self.returned:
         self.actual_return_date = timezone.now()
-        self.book.available = True
+        self.book.is_available = True
         self.book.save()
         self.save()
 
+
     def __str__(self):
-        return f"{self.user.username} borrowed {self.book.title} from {self.library.name}"
+        return f"{self.user.username} borrowed {self.book.title} from {self.library.name} at {self.borrow_date}"
 
 # class Transaction(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE)

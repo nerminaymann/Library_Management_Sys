@@ -4,7 +4,6 @@ from django.utils.translation import gettext as _
 
 User = get_user_model()
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -48,3 +47,11 @@ class LoginSerializer(serializers.Serializer):
         data['user']= user
         return data
 
+class OtherUsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','email','username',"phone_number"]
+
+    def update(self, instance, validated_data):
+        validated_data.pop('password', None)  # Prevent password update
+        return super().update(instance, validated_data)

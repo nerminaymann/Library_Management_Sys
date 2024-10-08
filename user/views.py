@@ -1,12 +1,10 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import generics, authentication, permissions, status
-
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import UserSerializer, LoginSerializer,OtherUsersSerializer
 
 User = get_user_model()
 
@@ -29,7 +27,6 @@ class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [
         permissions.AllowAny]
-    # renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -52,10 +49,16 @@ class UpdateUserView(generics.RetrieveUpdateAPIView):
     #Manage the Authenticated User
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    # authentication_class = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         return self.request.user
 
+# -----------------------------------UPDATE USER INFO-------------------------------------
+
+class UpdateOtherUsersView(generics.RetrieveUpdateAPIView):
+    #Manage the Authenticated User
+    queryset = User.objects.all()
+    serializer_class = OtherUsersSerializer
+    permission_classes = [permissions.IsAdminUser]
 
