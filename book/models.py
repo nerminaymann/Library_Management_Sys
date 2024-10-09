@@ -2,12 +2,14 @@ from datetime import timedelta
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.db import models
 from Library_Management_Sys import settings
 from library.models import Library
 from author.models import Author
-from user.models import User
+
+User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -51,13 +53,14 @@ class Transaction(models.Model):
         # When a book is returned
         #if self.returned:
         self.actual_return_date = timezone.now()
+        self.returned = True
         self.book.is_available = True
         self.book.save()
         self.save()
 
 
     def __str__(self):
-        return f"{self.user.username} borrowed {self.book.title} from {self.library.name} at {self.borrow_date}"
+        return f"{self.user} borrowed {self.book.title} from {self.library.name} at {self.borrow_date}"
 
 # class Transaction(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE)

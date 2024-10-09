@@ -22,9 +22,11 @@ class LibraryDetailView(generics.RetrieveAPIView):
     serializer_class = LibrarySerializer
     permission_classes = [IsAuthenticated]
     def get_library(self,request,pk):
-        book = get_object_or_404(Library, id=pk)
-        serializer = LibrarySerializer(book)
-        return Response(data = serializer.data,status=status.HTTP_200_OK)
+        library = get_object_or_404(Library, id=pk)
+        if library:
+            serializer = LibrarySerializer(library)
+            return Response(data = serializer.data,status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 
